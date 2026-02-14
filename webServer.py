@@ -60,7 +60,7 @@ def webServer(port=13331):
 
       # Fill in start
       	outputdata = outputdata + i
-      	connectionSocket.send(outputdata.encode())
+      	connectionSocket.sendall(outputdata.encode())
 
       # Fill in end
         
@@ -75,7 +75,7 @@ def webServer(port=13331):
 
       outputdata = b"HTTP/1.1 404 Not Found\r\n"
       outputdata = outputdata + b"Content-Type: text/html; charset=UTF-8\r\n\r\n<html><h2>404 Not Found</h2></html>"
-      connectionSocket.send(outputdata)
+      connectionSocket.sendall(outputdata)
       #Fill in end
 
 
