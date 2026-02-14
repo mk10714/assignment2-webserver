@@ -58,12 +58,13 @@ def webServer(port=13331):
       #Send everything as one send command, do not send one line/item at a time!
 
       # Fill in start
-      	outputdata = outputdata + i.readline()
+      	outputdata = outputdata + i
       	connectionSocket.send(outputdata.encode())
 
       # Fill in end
         
       connectionSocket.close() #closing the connection socket
+      f.close()
       
     except Exception as e:
       # Send response message for invalid request due to the file not being found (404)
@@ -71,8 +72,9 @@ def webServer(port=13331):
       #Fill in start
       
 
-      outputdata = b"404 Not Found\r\n"
-      
+      outputdata = b"HTTP/1.1 404 Not Found\r\n"
+      outputdata = outputdata + b"Content-Type: text/html; charset=UTF-8\r\n\r\n"
+      connectionSocket.send(outputdata)
       #Fill in end
 
 
