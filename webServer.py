@@ -46,7 +46,7 @@ def webServer(port=13331):
             outputdata = outputdata + b"Date: " + date_utc.encode() + b"\r\n"
             outputdata = outputdata + b"Server: Apache/2.4.62 (AlmaLinux) OpenSSL/3.5.1 mod_fcgid/2.3.9 mod_perl/2.0.12 Perl/v5.32.1\r\n"
             outputdata = outputdata + b"Content-Type: text/html; charset=UTF-8\r\n"
-            # outputdata = outputdata + b"Connection: close\r\n"
+            outputdata = outputdata + b"Connection: close\r\n"
             # outputdata = outputdata + b"Connection: keep-alive\r\n"
             outputdata = outputdata + b"\r\n"
             # Note that a complete header must end with a blank line, creating the four-byte sequence "\r\n\r\n"
@@ -92,6 +92,7 @@ def webServer(port=13331):
 
 if __name__ == "__main__":
     webServer(13331)
+
 
 
 
