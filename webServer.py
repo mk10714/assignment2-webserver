@@ -1,99 +1,102 @@
-#webserver.py
-
+# webserver.py
 # import socket module
 from socket import *
 # In order to terminate the program
 import sys
 from datetime import datetime
-#import rfc3339
 
+
+# import rfc3339
 
 
 def webServer(port=13331):
-  serverSocket = socket(AF_INET, SOCK_STREAM)
-  
-  #Prepare a server socket
-  serverSocket.bind(("", port))
-  
-  #Fill in start
-  serverSocket.listen(1)
+    serverSocket = socket(AF_INET, SOCK_STREAM)
 
-  #Fill in end
+    # Prepare a server socket
+    serverSocket.bind(("", port))  # Fill in start
+    serverSocket.listen(1)  # Fill in end
 
-  while True:
-    #Establish the connection
-    
-    print('Ready to serve...')
-    connectionSocket, addr = serverSocket.accept() #Fill in start -are you accepting connections?     #Fill in end
-    
-    try:
-      message = connectionSocket.recv(1024).decode() #Fill in start -a client is sending you a message   #Fill in end 
-      filename = message.split()[1]
-       
-      #opens the client requested file. 
-      #Plenty of guidance online on how to open and read a file in python. How should you read it though if you plan on sending it through a socket?
-      f = open(filename[1:], 'rb')     #fill in start              #fill in end   )
-      
-      
+    while True:
+        # Establish the connection
+        print('Ready to serve...')
+        connectionSocket, addr = serverSocket.accept()  # Fill in start - are you accepting connections?
+        # Fill in end
 
-      #This variable can store the headers you want to send for any valid or invalid request.   What header should be sent for a response that is ok?    
-      #Fill in start 
-              
-      #Content-Type is an example on how to send a header as bytes. There are more!
+        try:
+            # CHANGE 1: Fixed typo 'connectonSocket' to 'connectionSocket'
+            message = connectionSocket.recv(1024).decode()  # Fill in start - a client is sending you a message
+            # Fill in end
+            filename = message.split()[1]
 
-      outputdata = b"HTTP/1.1 200 OK\r\n"
-      now_utc = datetime.utcnow()
-      date_utc = now_utc.strftime('%a, %d %b %Y %H:%M:%S GMT')
-      outputdata = outputdata + b"Date: " + date_utc.encode() + b"\r\n"
-      outputdata = outputdata + b"Server: Apache/2.4.62 (AlmaLinux) OpenSSL/3.5.1 mod_fcgid/2.3.9 mod_perl/2.0.12 Perl/v5.32.1\r\n"
-      outputdata = outputdata + b"Content-Type: text/html; charset=UTF-8\r\n"
-      #outputdata = outputdata + b"Connection: close\r\n"
-      #outputdata = outputdata + b"Connection: keep-alive\r\n"
-      outputdata = outputdata + b"\r\n"
+            # Opens the client requested file.
+            # Plenty of guidance online on how to open and read a file in python.
+            # How should you read it though if you plan on sending it through a socket?
+            # CHANGE 5: Changed 'r' to 'rb' (binary mode) becasue HTTP responses are in bytes; binary work for HTML and is ussaly the standard. r (text mode) need encoding and oly work for txt files
+            f = open(filename[1:], 'rb')  # fill in start
+            # fill in end
 
-      #Note that a complete header must end with a blank line, creating the four-byte sequence "\r\n\r\n" Refer to https://w3.cs.jmu.edu/kirkpams/OpenCSF/Books/csf/html/TCPSockets.html
- 
-      #Fill in end
-               
-      for i in f: #for line in file
-      #Fill in start - append your html file contents #Fill in end 
-      	outputdata = outputdata + i
-        
-      #Send the content of the requested file to the client (don't forget the headers you created)!
-      #Send everything as one send command, do not send one line/item at a time!
+            # This variable can store the headers you want to send for any valid or invalid request.
+            # What header should be sent for a response that is ok?
+            # Fill in start
+            # Content-Type is an example on how to send a header as bytes. There are more!
+            outputdata = b"HTTP/1.1 200 OK\r\n"
 
-      # Fill in start    	
-      	connectionSocket.send(outputdata.encode())
+            # CHANGE 2: Added missing variable 'now_utc'. The line below uses now_utc.strftime() but the variable was never defined
+            now_utc = datetime.utcnow()
+            date_utc = now_utc.strftime('%a, %d %b %Y %H:%M:%S GMT')
+            # CHANGE 3: Added .encode() to date_utc and changed "\r\n" to b"\r\n". Cant concatenate bytes (b"Date: ") with string (date_utc). You need to encode the string to bytes
+            outputdata = outputdata + b"Date: " + date_utc.encode() + b"\r\n"
+            outputdata = outputdata + b"Server: Apache/2.4.62 (AlmaLinux) OpenSSL/3.5.1 mod_fcgid/2.3.9 mod_perl/2.0.12 Perl/v5.32.1\r\n"
+            outputdata = outputdata + b"Content-Type: text/html; charset=UTF-8\r\n"
+            # outputdata = outputdata + b"Connection: close\r\n"
+            # outputdata = outputdata + b"Connection: keep-alive\r\n"
+            # CHANGE 4: Changed "\r\n" to b"\r\n". outputdata is in bytes so you can concatenate with string
+            outputdata = outputdata + b"\r\n"
+            # Note that a complete header must end with a blank line, creating the four-byte sequence "\r\n\r\n"
+            # Refer to https://w3.cs.jmu.edu/kirkpams/OpenCSF/Books/csf/html/TCPSockets.html
+            # Fill in end
 
-      # Fill in end
-        
-      connectionSocket.close() #closing the connection socket
-      f.close()
-      
-    except Exception as e:
-      # Send response message for invalid request due to the file not being found (404)
-      # Remember the format you used in the try: block!
-      #Fill in start
-      
+            # Read file content
+            for i in f:  # for line in file
+                # Fill in start - append your html file contents
+                # Fill in end
+                # CHANGE 6: Changed outputdata = outputdata + i.read() to outputdata = outputdata + i. With 'rb' mode, i is already in bytes so no encoding is needed
+                # *** Original had i.read() which was wrong - i is a line, not a file object ***
+                outputdata = outputdata + i
 
-      outputdata_notfound = b"HTTP/1.1 404 Not Found\r\n"
-      outputdata_notfound = outputdata_notfound + b"Content-Type: text/html; charset=UTF-8\r\n\r\n"
-      outputdata_notfound = outputdata_notfound + b"<html><head></head><body><h1>404 Not Found</h1></body></html>"
-      
-      connectionSocket.send(outputdata_notfound)
-      #Fill in end
+            # Send the content of the requested file to the client (don't forget the headers you created)!
+            # Send everything as one send command, do not send one line/item at a time!
+            # Fill in start
+            # CHANGE 7: Removed .encode() from outputdata becasue outputdata is already bytes, no need for encoding
+            connectionSocket.send(outputdata)
+            # Fill in end
 
+            connectionSocket.close()  # closing the connection socket
+            f.close()
 
-      
-      #Close client socket
-      #Fill in start
-      connectionSocket.close() #closing the connection socket
-      #Fill in end
+        except Exception as e:
+            # Send response message for invalid request due to the file not being found (404)
+            # Remember the format you used in the try: block!
+            # Fill in start
+            outputdata_notfound = b"HTTP/1.1 404 Not Found\r\n"
+            # CHANGE 8: Split HTML content into separate lines. I did this becacasue it easier to read, tou can change it back I you want
+            outputdata_notfound = outputdata_notfound + b"Content-Type: text/html; charset=UTF-8\r\n\r\n"
+            outputdata_notfound = outputdata_notfound + b"<html><head></head><body><h1>404 Not Found</h1></body></html>"
+            # CHANGE 9: Removed .encode() from outputdata_notfound becasue it is already in bytes, no need for encode
+            connectionSocket.send(outputdata_notfound)
+            # Fill in end
 
-  # Commenting out the below (some use it for local testing). It is not required for Gradescope, and some students have moved it erroneously in the While loop. 
-  # DO NOT PLACE ANYWHERE ELSE AND DO NOT UNCOMMENT WHEN SUBMITTING, YOU ARE GONNA HAVE A BAD TIME
-  #serverSocket.close()
-  #sys.exit()  # Terminate the program after sending the corresponding data
+            # Close client socket
+            # Fill in start
+            connectionSocket.close()  # closing the connection socket
+            # Fill in end
+
+    # Commenting out the below (some use it for local testing).
+    # It is not required for Gradescope, and some students have moved it erroneously in the While loop.
+    # DO NOT PLACE ANYWHERE ELSE AND DO NOT UNCOMMENT WHEN SUBMITTING, YOU ARE GONNA HAVE A BAD TIME
+    # serverSocket.close()
+    # sys.exit()  # Terminate the program after sending the corresponding data
+
 
 if __name__ == "__main__":
-  webServer(13331)
+    webServer(13331)
