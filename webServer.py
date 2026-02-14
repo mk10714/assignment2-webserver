@@ -44,6 +44,7 @@ def webServer(port=13331):
       outputdata = b"HTTP/1.1 200 OK\r\n"
       date_utc = now_utc.strftime('%a, %d %b %Y %H:%M:%S GMT')
       outputdata = outputdata + b"Date: " + date_utc + "\r\n"
+      outputdata = outputdata + b"Server: Bilal Server Python Assignment 2\r\n"
       outputdata = outputdata + b"Content-Type: text/html; charset=UTF-8\r\n"
       outputdata = outputdata + "\r\n"
 
