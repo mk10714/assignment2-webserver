@@ -46,7 +46,7 @@ def webServer(port=13331):
       outputdata = outputdata + b"Date: " + date_utc + "\r\n"
       outputdata = outputdata + b"Server: Apache/2.4.62 (AlmaLinux) OpenSSL/3.5.1 mod_fcgid/2.3.9 mod_perl/2.0.12 Perl/v5.32.1\r\n"
       outputdata = outputdata + b"Content-Type: text/html; charset=UTF-8\r\n"
-      outputdata = outputdata + b"Connection: keep-alive\r\n"
+      outputdata = outputdata + b"Connection: close\r\n"
       outputdata = outputdata + "\r\n"
 
       #Note that a complete header must end with a blank line, creating the four-byte sequence "\r\n\r\n" Refer to https://w3.cs.jmu.edu/kirkpams/OpenCSF/Books/csf/html/TCPSockets.html
@@ -55,13 +55,13 @@ def webServer(port=13331):
                
       for i in f: #for line in file
       #Fill in start - append your html file contents #Fill in end 
-      	outputdata = outputdata + i.read ()
+      	outputdata = outputdata + i#.read ()
         
       #Send the content of the requested file to the client (don't forget the headers you created)!
       #Send everything as one send command, do not send one line/item at a time!
 
       # Fill in start    	
-      	connectionSocket.send(outputdata.encode())
+      	connectionSocket.sendall(outputdata.encode())
 
       # Fill in end
         
@@ -74,9 +74,9 @@ def webServer(port=13331):
       #Fill in start
       
 
-      outputdata = b"HTTP/1.1 404 Not Found\r\n"
-      outputdata = outputdata + b"Content-Type: text/html; charset=UTF-8\r\n\r\n<html><h2>404 Not Found</h2></html>"
-      connectionSocket.send(outputdata)
+      outputdata_notfound = b"HTTP/1.1 404 Not Found\r\n"
+      outputdata_notfound = outputdata_notfound + b"Content-Type: text/html; charset=UTF-8\r\n\r\n<html><h2>404 Not Found</h2></html>"
+      connectionSocket.sendall(outputdata_notfound)
       #Fill in end
 
 
