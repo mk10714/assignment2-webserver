@@ -46,6 +46,7 @@ def webServer(port=13331):
       outputdata = outputdata + b"Date: " + date_utc + "\r\n"
       outputdata = outputdata + b"Server: Apache/2.4.62 (AlmaLinux) OpenSSL/3.5.1 mod_fcgid/2.3.9 mod_perl/2.0.12 Perl/v5.32.1\r\n"
       outputdata = outputdata + b"Content-Type: text/html; charset=UTF-8\r\n"
+      outputdata = outputdata + b"Connection: close\r\n"
       outputdata = outputdata + "\r\n"
 
       #Note that a complete header must end with a blank line, creating the four-byte sequence "\r\n\r\n" Refer to https://w3.cs.jmu.edu/kirkpams/OpenCSF/Books/csf/html/TCPSockets.html
@@ -72,10 +73,14 @@ def webServer(port=13331):
       # Remember the format you used in the try: block!
       #Fill in start
       
-
       outputdata = b"HTTP/1.1 404 Not Found\r\n"
-      outputdata = outputdata + b"Content-Type: text/html; charset=UTF-8\r\n\r\n<html><h2>404 Not Found</h2></html>"
-      connectionSocket.send(outputdata)
+      date_utc = now_utc.strftime('%a, %d %b %Y %H:%M:%S GMT')
+      outputdata = outputdata + b"Date: " + date_utc + "\r\n"
+      outputdata = outputdata + b"Server: Apache/2.4.62 (AlmaLinux) OpenSSL/3.5.1 mod_fcgid/2.3.9 mod_perl/2.0.12 Perl/v5.32.1\r\n"
+      outputdata = outputdata + b"Connection: close\r\n\r\n"
+      outputdata = outputdata + b"Content-Type: text/html; charset=UTF-8\r\n\r\n"
+      outputdata = outputdata + "<html><h2>404 Not Found</h2></html>"
+      connectionSocket.send(outputdata.encode())
       #Fill in end
 
 
